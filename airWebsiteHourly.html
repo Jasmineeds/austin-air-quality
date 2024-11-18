@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8"> <!-- necessary as we may use µg -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"> </script> <!-- chart library-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"> </script> <!-- parse library-->
+</head>
+
+<body>
+
+    <h1> Pollution Data Plotter </h1>
+
+    <!-- Button to upload CSV File -->
+    <input type="file" id="DataUpload" />
+
+    <!-- Dropdown to Select Pollutant to Plot -->
+    <label for="pollutantToPlot"> Choose Pollutant: </label>
+    <select id="pollutantToPlot">
+        <option value = "pm25"> PM2.5 </option>
+        <option value = "pm10"> PM10 </option>
+        <option value = "co"> CO </option>
+        <option value = "no2"> NO2 </option>
+        <option value = "o3"> O3 </option>
+    </select>
+
+    <!-- Select start and end date -->
+    <label for = "startDate"> Start Date: </label>
+    <input type = "date" id = "startDate" />
+
+    <label for="endDate"> End Date: </label>
+    <input type="date" id="endDate" />
+
+    <!-- Button to execute ProcessData function and generate a plot-->
+    <button id = "generatePlotButton"> Generate Plot </button>
+
+    <!-- Canvas for scatterplot -->
+    <div>
+        <canvas id = "scatterPlot" width = "400" height = "200"></canvas>
+    </div>
+
+    <script>
+
+        let airData = []; // Initialize the airData
+        let chartInstance = null; // Initialize a variable holding a reference to the chart created by chart.js
+
+        // Once data is uploaded, parse it
+        document.getElementById('DataUpload').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                Papa.parse(file, {
+                    complete: function(results) {
+                        airData = results.data;
+                    },
+                    header: true // First row is headers
+                });
+            }
+        });
+
+        // Function to process the data and plot it
+        function processData() {
+            const pollutant = document.getElementById('pollutantToPlot').value; // pollutant we're plotting
+            const startDate = document.getElementById('startDate').value; // our start date
+            const endDate = document.getElementById('endDate').value; // our end date
+
+            // Check if the end date is before the start date
+            if (startDate && endDate && endDate < startDate) {
+                alert("End date must be after start date");
+                return;
+            }
+
+            // establish date range for filtering
+            const dataStartDate = new Date(airData[0].timestamp); 
+            const dataEndDate = new Date(airData[airData.length - 1].timestamp); 
+
+            const selectedStartDate = startDate ? new Date(startDate) : null;
+            const selectedEndDate = endDate ? new Date(endDate) : null;
+
+            // Initialize datetimes and concentrations
+            const datetimes = [];
+            const concentrations = [];
+
+            // Filter data based on date range
+            const filteredData = airData.filter(row => {
+                const timestamp = new Date(row.timestamp);
+
+                if (isNaN(timestamp)) { // There are a few data rows with invalid timestamps; skip them
+                    console.error("Invalid timestamp:", row.timestamp);
+                    return false;
+                }
+
+                const start = startDate ? new Date(startDate + 'T00:00:00Z') : null; // include as early as midnight of start date
+                const end = endDate ? new Date(endDate + 'T23:59:59.999Z') : null; // go through midnight of end date
+
+                if (start && timestamp < start) {
+                    return false; // skip rows before start date
+                }
+
+                if (end && timestamp > end) {
+                    return false; // skip rows after end date
+                }
+
+                return true; // include rows within date range
+            });
+
+            if (filteredData.length === 0) { // if start and end dates fall outside of date range
+                alert("No data available for the selected date range.");
+                return;
+            }
+
+            // Finally, get the pollutant of interest in the timestmap rows of interest and push them to datetimes and concentrations
+            filteredData.forEach(row => {
+                datetimes.push(row.timestamp);
+                concentrations.push(parseFloat(row[pollutant]));
+            });
+
+            // Update plot
+            createPlot(datetimes, concentrations);
+        }
+
+        // Function to create or update our scatter plot using chart js library
+        function createPlot(datetimes, concentrations) {
+            const airchart = document.getElementById('scatterPlot').getContext('2d');
+
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            chartInstance = new Chart(airchart, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Hourly Pollutant Concentrations',
+                        data: datetimes.map((timestamp, index) => ({
+                            x: timestamp,
+                            y: concentrations[index]
+                        }))
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            type: 'category',
+                            title: {
+                                display: true,
+                                text: 'Timestamp'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Pollutant Level'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Finally, ensure process data is called after page loads
+        window.onload = function() {
+            document.getElementById('generatePlotButton').onclick = processData;
+        };
+    </script>
+</body>
+</html>
