@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Austin Air Quality</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 200px;
+            background-color: #fff;
+            padding: 20px;
+            height: 100vh;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            color: #7FB5B5;
+            font-size: 24px;
+            margin-bottom: 40px;
+        }
+        
+
+        .nav-menu {
+            list-style: none;
+            padding: 0;
+        }
+
+        .nav-menu li {
+            margin: 15px 0;
+            color: #666;
+            cursor: pointer;
+        }
+
+        #map-container {
+            flex: 1;
+            height: 100vh;
+            background-color: #f5f5f5;
+        }
+    </style>
+    <!-- Include Mapbox or Google Maps API -->
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css' rel='stylesheet' />
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">Austin Air Quality</div>
+        <ul class="nav-menu">
+            <li>Map</li>
+            <li>Data</li>
+            <li>Pollutants</li>
+            <li>Project Background</li>
+        </ul>
+    </div>
+    <div id="map-container"></div>
+
+    <script>
+        // Initialize map (using Mapbox as an example)
+        mapboxgl.accessToken = 'YOUR_MAPBOX_TOKEN';
+        const map = new mapboxgl.Map({
+            container: 'map-container',
+            style: 'mapbox://styles/mapbox/light-v10',
+            center: [-97.7431, 30.2672], // Austin coordinates
+            zoom: 11
+        });
+
+        // Add navigation controls
+        map.addControl(new mapboxgl.NavigationControl());
+
+        // Add event listeners for menu items
+        document.querySelectorAll('.nav-menu li').forEach(item => {
+            item.addEventListener('click', function() {
+                // Handle navigation menu clicks
+                console.log('Clicked:', this.textContent);
+                // Add your navigation logic here
+            });
+        });
+
+        // Function to add markers or data layers
+        function addAirQualityData() {
+            // Add your air quality data visualization logic here
+        }
+
+        // Initialize the map with data
+        map.on('load', function() {
+            addAirQualityData();
+        });
+    </script>
+</body>
+</html>
