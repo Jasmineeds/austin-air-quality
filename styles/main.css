@@ -1,0 +1,99 @@
+/* Global Styles */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  display: flex;
+}
+
+/* Navbar Styles */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  /* ensure nav bar on top */
+}
+
+.title {
+  color: #7FB5B5;
+  font-size: 24px;
+  margin: 20px 0;
+}
+
+.hamburger {
+  color: #7FB5B5;
+  font-size: 36px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  position: fixed;
+  top: 90px;
+  left: -200px;
+  /* default hide */
+  width: 200px;
+  background-color: #fff;
+  padding: 20px;
+  height: 100vh;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  transition: left 0.3s ease;
+}
+
+.sidebar.open {
+  left: 0;
+  /* toggle sidebar to open */
+}
+
+body.sidebar-open #page-container {
+  margin-left: 260px;
+  /* when sidebar open, content move to avoid be blocked */
+}
+
+/* Menu Styles */
+.nav-menu {
+  list-style: none;
+  padding: 0;
+}
+
+.nav-menu li {
+  margin: 15px 0;
+  color: #666;
+  cursor: pointer;
+  padding: 10px;
+  transition: background-color 0.3s;
+}
+
+.nav-menu li:hover {
+  background-color: #f0f0f0;
+}
+
+.nav-menu li.active {
+  color: #7FB5B5;
+  font-weight: bold;
+}
+
+/* Page Container */
+#page-container {
+  flex: 1;
+  margin-top: 80px;
+  margin-left: 60px;
+  /* avoid blocked by nav bar */
+  transition: margin-left 0.3s ease;
+}
+
+.page {
+  display: none;
+}
+
+.page.active {
+  display: block;
+}

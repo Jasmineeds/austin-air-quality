@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8"> <!-- necessary as we may use µg -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Austin Air Quality</title>
+
+  <!-- External Libraries -->
+  <script src='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js'></script>
+  <link href='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css' rel='stylesheet' />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- chart library-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script> <!-- parse library-->
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/map.css">
+  <link rel="stylesheet" href="styles/chart.css">
+  <link rel="stylesheet" href="styles/info.css">
+</head>
+
+<body>
+  <!-- Navigation Bar -->
+  <div class="navbar">
+    <div class="hamburger">☰</div>
+    <div class="title">Austin Air Quality</div>
+  </div>
+
+  <div class="sidebar">
+    <ul class="nav-menu">
+      <li data-page="map">Map</li>
+      <li data-page="chart">Data</li>
+      <li data-page="info">Pollutant</li>
+      <li data-page="background">Background</li>
+    </ul>
+  </div>
+
+  <div id="page-container">
+    <div id="map-page" class="page active">
+      <div id="map-container"></div>
+    </div>
+
+    <div id="chart-page" class="page">
+      <h1>Pollution Data Plotter</h1>
+
+      <!-- Button to upload CSV File -->
+      <input type="file" id="DataUpload" />
+
+      <!-- Dropdown to Select Pollutant to Plot -->
+      <select id="pollutantToPlot">
+        <option value="pm25">PM2.5</option>
+        <option value="pm10">PM10</option>
+        <option value="co">CO</option>
+        <option value="no2">NO2</option>
+        <option value="o3">O3</option>
+      </select>
+
+      <!-- Select start and end date -->
+      <label for="startDate">Start Date:</label>
+      <input type="date" id="startDate" />
+      <label for="endDate">End Date:</label>
+      <input type="date" id="endDate" />
+
+      <!-- Button to execute ProcessData function and generate a plot-->
+      <button id="generatePlotButton">Generate Plot</button>
+
+      <!-- Canvas for scatterplot -->
+      <canvas id="scatterPlot" width="400" height="200"></canvas>
+    </div>
+
+    <div id="info-page" class="page">
+      <h1>Pollutant Information</h1>
+      <div id="pollutant-details"></div>
+    </div>
+
+    <div id="background-page" class="page">
+      <h1>Background</h1>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="scripts/main.js"></script>
+  <script src="scripts/map.js"></script>
+  <script src="scripts/chart.js"></script>
+  <script src="scripts/info.js"></script>
+</body>
+
+</html>
