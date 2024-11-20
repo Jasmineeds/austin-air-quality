@@ -97,3 +97,56 @@ body.sidebar-open #page-container {
 .page.active {
   display: block;
 }
+
+/* Information Page Nav Btn */
+.nav-buttons {
+  display: flex;
+}
+
+.nav-button {
+  background-color: transparent;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  margin: 0 10px;
+  padding: 10px;
+  transition: color 0.3s;
+}
+
+.nav-button.active {
+  color: #7FB5B5;
+  font-weight: bold;
+}
+
+.section {
+  padding: 80px 20px 20px;
+}
+
+/* Pollutant Section */
+.pollutant-title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.pollutant-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+/* left side: text */
+.pollutant-text {
+  flex: 1;
+  padding-right: 20px;
+}
+
+/* right side: image */
+.pollutant-image {
+  flex: 1;
+}
+
+.pollutant-image img {
+  width: 100%;
+  height: auto;
+}

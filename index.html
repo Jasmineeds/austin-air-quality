@@ -70,7 +70,17 @@
 
     <div id="info-page" class="page">
       <h1>Pollutant Information</h1>
-      <div id="pollutant-details"></div>
+      <div class="nav-buttons">
+        <button class="nav-button" data-section="co">CO</button>
+        <button class="nav-button" data-section="no2">NO2</button>
+        <button class="nav-button" data-section="o3">O3</button>
+        <button class="nav-button" data-section="pm">PM</button>
+      </div>
+      <!-- content generate from scripts/info.js -->
+      <div class="section" id="co"></div>
+      <div class="section" id="no2"></div>
+      <div class="section" id="o3"></div>
+      <div class="section" id="pm"></div>
     </div>
 
     <div id="background-page" class="page">
