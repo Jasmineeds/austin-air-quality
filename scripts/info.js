@@ -39,17 +39,17 @@ function displayPollutantInfo(pollutant) {
     <div class="pollutant-content">
       <!-- Left side: Text content -->
       <div class="pollutant-text">
-        <div>
+        <div class="first-paragraph">
           <h3>What is ${details.alias}?</h3>
           <p>${details.description}</p>
         </div>
-        <div>
+        <div class="second-paragraph">
           <h3>Sources of ${details.alias}?</h3>
           <ul>
             ${details.sources.map(source => `<li>${source}</li>`).join('')}
           </ul>
         </div>
-        <div>
+        <div class="third-paragraph">
           <h3>Health impacts of ${details.alias}?</h3>
           <ul>
             ${details.healthEffects.map(effect => `<li>${effect}</li>`).join('')}

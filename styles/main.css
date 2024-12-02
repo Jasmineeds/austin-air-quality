@@ -2,7 +2,9 @@
 body {
   margin: 0;
   padding: 0;
-  font-family: Arial, sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 100;
+  line-height: 150%;
   display: flex;
 }
 
@@ -23,8 +25,9 @@ body {
 
 .title {
   color: #7FB5B5;
-  font-size: 24px;
-  margin: 20px 0;
+  font-size: 28px;
+  margin: 22px 0;
+  padding-left: 10px;
 }
 
 .hamburger {
@@ -68,8 +71,9 @@ body.sidebar-open #page-container {
   margin: 15px 0;
   color: #666;
   cursor: pointer;
-  padding: 10px;
+  padding: 5px;
   transition: background-color 0.3s;
+  font-size: large;
 }
 
 .nav-menu li:hover {
@@ -108,28 +112,33 @@ body.sidebar-open #page-container {
   border: none;
   color: #666;
   cursor: pointer;
-  margin: 0 10px;
+  margin: 0 20px;
   padding: 10px;
   transition: color 0.3s;
+  font-size: large;
 }
 
 .nav-button.active {
   color: #7FB5B5;
   font-weight: bold;
+  text-decoration-line: underline;
+  text-decoration-thickness: 3px;
 }
 
 .section {
-  padding: 80px 20px 20px;
+  padding: 20px 20px 30px 10px;
+  margin-left: 20px;
 }
 
 /* Pollutant Section */
 .pollutant-title {
-  font-size: 2rem;
-  font-weight: bold;
-  margin-bottom: 20px;
+  font-size: 1.5rem;
+  font-weight: medium;
+  margin-bottom: 30px;
 }
 
 .pollutant-content {
+  font-size:large;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -138,15 +147,52 @@ body.sidebar-open #page-container {
 /* left side: text */
 .pollutant-text {
   flex: 1;
-  padding-right: 20px;
+  /* padding-right: 10px; */
 }
 
 /* right side: image */
 .pollutant-image {
-  flex: 1;
+  flex-basis: 35%;
+  margin-right: 100px;
 }
 
 .pollutant-image img {
   width: 100%;
   height: auto;
+}
+
+/* page title */
+.page-title {
+  font-weight: medium;
+  font-size: xx-large;
+  padding: 30px 30px 0px;
+}
+
+/* adding background color to individual paragraphs */ 
+.first-paragraph {
+  background-color: #dff2f2;
+  border-radius: 15px;
+  padding: 10px;
+  padding-inline: 30px;
+  margin-bottom: 20px;
+  margin-right: 100px;
+
+}
+
+.second-paragraph {
+  background-color: #dff2f2;
+  border-radius: 15px;
+  padding: 10px;
+  padding-inline: 30px;
+  margin-bottom: 20px;
+  margin-right: 100px;
+}
+
+.third-paragraph {
+  background-color: #dff2f2;
+  border-radius: 15px;
+  padding: 10px;
+  padding-inline: 30px;
+  margin-bottom: 20px;
+  margin-right: 100px;
 }
