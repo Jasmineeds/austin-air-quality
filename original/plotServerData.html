@@ -1,0 +1,195 @@
+<!--This html file will plot server data from a data folder in XAMPP htdocs-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8"> <!-- Ensures support for special characters like µ -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Include the Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Include the Chart.js date adapter -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    
+    <!-- Include PapaParse for CSV parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    
+    <title>Air Quality Index Plotter</title>
+</head>
+
+<body>
+    <h1>Air Quality Index Plotter</h1>
+    
+    <!-- Dropdown to select pollutant -->
+    <label for="pollutantToPlot">Choose Pollutant:</label>
+    <select id="pollutantToPlot">
+        <option value="pm25">PM2.5</option>
+        <option value="pm10">PM10</option>
+        <option value="co">CO</option>
+        <option value="no2">NO2</option>
+        <option value="o3">O3</option>
+    </select>
+
+    <!-- Date pickers for selecting start and end dates -->
+    <label for="startDate">Start Date:</label>
+    <input type="date" id="startDate" />
+    <label for="endDate">End Date:</label>
+    <input type="date" id="endDate" />
+
+    <!-- Button to generate the plot -->
+    <button id="generatePlotButton">Generate Plot</button>
+
+    <!-- Canvas for Chart.js -->
+    <div>
+        <canvas id="scatterPlot" width="400" height="200"></canvas>
+    </div>
+
+    <!-- Custom JavaScript -->
+    <script>
+        let airData = [];
+        let chartInstance = null;
+    
+        // Load CSV data from the server
+        async function loadCSV() {
+            try {
+                const response = await fetch('/data/aqi_0.csv');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const csvText = await response.text();
+                const results = Papa.parse(csvText, { header: true });
+                airData = results.data;
+            } catch (error) {
+                console.error("Error loading CSV:", error);
+                alert("Failed to load CSV file.");
+            }
+        }
+    
+        // Check if a date is within the valid range (up to 2024 or the present date)
+        function isValidDateRange(startDate, endDate) {
+            const maxDate = new Date();
+            const endOf2024 = new Date('2024-12-31T23:59:59Z');
+            const finalMaxDate = maxDate < endOf2024 ? maxDate : endOf2024;
+    
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+    
+            return start <= finalMaxDate && end <= finalMaxDate && start <= end;
+        }
+    
+        // Adjust 2023 timestamps to 2024 for plotting
+        function adjustTimestampTo2024(timestamp) {
+            const date = new Date(timestamp);
+            const adjustedDate = new Date(date);
+            adjustedDate.setFullYear(2024);
+            return adjustedDate;
+        }
+    
+        // Process the data for the selected pollutant and date range
+        function processData() {
+            const pollutant = document.getElementById('pollutantToPlot').value;
+            const startDateInput = document.getElementById('startDate').value;
+            const endDateInput = document.getElementById('endDate').value;
+    
+            if (!startDateInput || !endDateInput) {
+                alert("Please select both start and end dates.");
+                return;
+            }
+    
+            if (!isValidDateRange(startDateInput, endDateInput)) {
+                alert("No data exists for the selected date range.");
+                return;
+            }
+    
+            const filteredData = airData.filter(row => {
+                const originalDate = new Date(row.timestamp);
+                const adjustedDate = adjustTimestampTo2024(originalDate);
+                return adjustedDate >= new Date(startDateInput) && adjustedDate <= new Date(endDateInput);
+            });
+    
+            if (filteredData.length === 0) {
+                alert("No data available for the selected date range.");
+                return;
+            }
+    
+            const datetimes = [];
+            const concentrations = [];
+    
+            filteredData.forEach(row => {
+                const adjustedDate = adjustTimestampTo2024(new Date(row.timestamp));
+                datetimes.push(adjustedDate);
+                concentrations.push(parseFloat(row[pollutant]) || 0);
+            });
+    
+            createPlot(datetimes, concentrations, pollutant);
+        }
+    
+        function createPlot(datetimes, concentrations, pollutant) {
+            const ctx = document.getElementById('scatterPlot').getContext('2d');
+    
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+    
+            chartInstance = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: `Hourly ${pollutant.toUpperCase()} AQI`,
+                        data: datetimes.map((x, i) => ({ x, y: concentrations[i] })),
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1,
+                        pointRadius: 3
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'day', // Group ticks by day
+                                tooltipFormat: 'yyyy-MM-dd HH:mm',
+                                displayFormats: {
+                                    hour: 'MMM dd, HH:mm',
+                                    day: 'MMM dd',
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Timestamp'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Air Quality Index'
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    return `${context.raw.x}: ${context.raw.y.toFixed(2)}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    
+        window.onload = function () {
+            loadCSV().then(() => {
+                document.getElementById('generatePlotButton').onclick = processData;
+            });
+        };
+    </script>
+     
+</body>
+
+</html>
