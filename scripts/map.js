@@ -39,7 +39,6 @@ async function loadCSV(filePath) {
   });
 }
 
-// Function to calculate the distance between two coordinates (in km)
 // Function to calculate the distance between two coordinates (in meters), treating lat/lng as an x-y grid
 function calculateDistance(lat1, lon1, lat2, lon2) {
   const latDifference = Math.abs(lat2 - lat1) * 1.17; // Scale latitude by 1.17
@@ -138,10 +137,6 @@ async function getAQI(lat, lng, currentTime) {
     }
   }
 }
-
-
-
-
 
 // Function to determine AQI color based on the AQI value
 function getAQIColor(aqi) {
@@ -244,7 +239,7 @@ class MapHandler {
         const marker = new google.maps.Circle({
           map: this.map,
           center: { lat, lng },
-          radius: 200, // Adjust the radius as needed
+          radius: 200,
           fillColor: color,
           fillOpacity: 0.4,
           strokeColor: color,
@@ -267,7 +262,6 @@ class MapHandler {
     }
   }
   
-
   updateMarker(position) {
     if (this.currentMarker) {
       this.currentMarker.setMap(null);
