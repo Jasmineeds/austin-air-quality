@@ -2,13 +2,14 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8"> <!-- necessary as we may use µg -->
+  <meta charset="UTF-8"> <!-- Necessary as we may use µg -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Austin Air Quality</title>
 
   <!-- External Libraries -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- chart library-->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script> <!-- parse library-->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script> <!-- CSV parser -->
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 
   <!-- Stylesheets -->
   <link rel="stylesheet" href="styles/main.css">
@@ -43,10 +44,23 @@
     <div id="chart-page" class="page">
       <h1 class="page-title">Pollution Data Plotter</h1>
 
-      <!-- Button to upload CSV File -->
-      <input type="file" id="DataUpload" />
+      <!-- Dropdown to Select CSV File -->
+      <label for="csvDropdown">Select Data File:</label>
+      <select id="csvDropdown">
+        <option value="aqi_0.csv">AQI Data 0</option>
+        <option value="aqi_1.csv">AQI Data 1</option>
+        <option value="aqi_2.csv">AQI Data 2</option>
+        <option value="aqi_3.csv">AQI Data 3</option>
+        <option value="aqi_4.csv">AQI Data 4</option>
+        <option value="aqi_5.csv">AQI Data 5</option>
+        <option value="aqi_6.csv">AQI Data 6</option>
+        <option value="aqi_7.csv">AQI Data 7</option>
+        <option value="aqi_8.csv">AQI Data 8</option>
+        <option value="aqi_9.csv">AQI Data 9</option>
+      </select>
 
       <!-- Dropdown to Select Pollutant to Plot -->
+      <label for="pollutantToPlot">Choose Pollutant:</label>
       <select id="pollutantToPlot">
         <option value="pm25">PM2.5</option>
         <option value="pm10">PM10</option>
@@ -61,10 +75,10 @@
       <label for="endDate">End Date:</label>
       <input type="date" id="endDate" />
 
-      <!-- Button to execute ProcessData function and generate a plot-->
+      <!-- Button to generate a plot -->
       <button id="generatePlotButton">Generate Plot</button>
 
-      <!-- Canvas for scatterplot -->
+      <!-- Canvas for Scatterplot -->
       <canvas id="scatterPlot" width="400" height="200"></canvas>
     </div>
 
@@ -76,7 +90,7 @@
         <button class="nav-button" data-section="o3">O3</button>
         <button class="nav-button" data-section="pm">PM</button>
       </div>
-      <!-- content generate from scripts/info.js -->
+      <!-- Content generated from scripts/info.js -->
       <div class="section" id="co"></div>
       <div class="section" id="no2"></div>
       <div class="section" id="o3"></div>
@@ -90,7 +104,7 @@
 
   <!-- Scripts -->
   <script src="scripts/main.js"></script>
-  <script src="scripts/map.js"></script>
+  <script type="module" src="scripts/map.js"></script>
   <script src="scripts/chart.js"></script>
   <script src="scripts/info.js"></script>
 </body>
