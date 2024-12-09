@@ -1,101 +1,118 @@
-// JavaScript for dynamically selecting and plotting AQI data from multiple CSV files
+// JavaScript for dynamically selecting and plotting AQI data from CSV files in server
 
 let airData = [];
 let chartInstance = null;
 
 // Load CSV data based on the selected file from the dropdown
 async function loadCSV(selectedFile) {
-    try {
-        const response = await fetch(`/data/${selectedFile}`);
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const csvText = await response.text();
-        const results = Papa.parse(csvText, { header: true });
-        airData = results.data;
-    } catch (error) {
-        console.error("Error loading CSV:", error);
-        alert("Failed to load CSV file.");
-    }
+    const response = await fetch(`/data/${selectedFile}`);
+    airData = Papa.parse(await response.text(), { header: true }).data;
 }
 
-// Check if a date is within the valid range (up to 2024 or the present date)
+// Check if a date is within the valid range (2024 up to the present date)
 function isValidDateRange(startDate, endDate) {
-    const maxDate = new Date();
-    const endOf2024 = new Date('2024-12-31T23:59:59Z');
-    const finalMaxDate = maxDate < endOf2024 ? maxDate : endOf2024;
+    const today = new Date();
+    today.setHours(23, 59, 59, 999); // Set to end of the day
 
     const start = new Date(startDate);
     const end = new Date(endDate);
 
-    return start <= finalMaxDate && end <= finalMaxDate && start <= end;
+    if (start < new Date('2024-01-01') || end < new Date('2024-01-01')) {
+        return false;
+    }
+
+    return start <= today && end <= today && start <= end;
 }
 
-// Adjust 2023 timestamps to 2024 for plotting
+// Needed for later - to set CSV dates to 2024
 function adjustTimestampTo2024(timestamp) {
     const date = new Date(timestamp);
-    const adjustedDate = new Date(date);
-    adjustedDate.setFullYear(2024);
-    return adjustedDate;
+    date.setFullYear(2024);
+    return date;
 }
 
-// Process the data for the selected pollutant and date range
+// Process user inputs and plot data
 function processData() {
-    const pollutant = document.getElementById('pollutantToPlot').value;
-    const startDateInput = document.getElementById('startDate').value;
-    const endDateInput = document.getElementById('endDate').value;
+    const pollutant = document.getElementById('pollutantToPlot').value; // get pollutant from dropdown
+    const startDateInput = document.getElementById('startDate').value; // get startdate from dropdown
+    const endDateInput = document.getElementById('endDate').value; // get enddate from dropdown
 
-    if (!startDateInput || !endDateInput) {
-        alert("Please select both start and end dates.");
-        return;
-    }
-
+    // make sure data is in appropriate range, i.e. 2024
     if (!isValidDateRange(startDateInput, endDateInput)) {
-        alert("No data exists for the selected date range.");
+        alert("Select a site and an appropriate date range.");
         return;
     }
 
+    // convert input values to dates
+    const startDate = new Date(startDateInput);
+    let endDate = new Date(endDateInput);
+
+    // Set startDate to the beginning of the day (00:00:00)
+    startDate.setHours(0, 0, 0, 0);
+
+    // Offset startdate and enddate by 1 day (otherwise there's a bug in visualizing data)
+    if (endDate.toDateString() !== new Date().toDateString()) {
+        endDate.setDate(endDate.getDate() + 1);
+    }
+    startDate.setDate(startDate.getDate() + 1);
+
+    // Set endDate to the end of the new date
+    endDate.setHours(23, 59, 59, 999);
+
+    // If endDate is today set it to the current time
+    if (endDate.toDateString() == new Date().toDateString()) {
+        const currentDate = new Date();
+        endDate.setHours(currentDate.getHours(), currentDate.getMinutes(), currentDate.getSeconds(), currentDate.getMilliseconds());
+    }
+
+    // Filter data based on the date range
     const filteredData = airData.filter(row => {
         const originalDate = new Date(row.timestamp);
-        const adjustedDate = adjustTimestampTo2024(originalDate);
-        return adjustedDate >= new Date(startDateInput) && adjustedDate <= new Date(endDateInput);
-    });
+        const adjustedDate = adjustTimestampTo2024(originalDate); // set year to 2024
 
-    if (filteredData.length === 0) {
-        alert("No data available for the selected date range.");
-        return;
-    }
+        // Check if the adjusted date falls within the specified range
+        return adjustedDate >= startDate && adjustedDate <= endDate;
+    });
 
     const datetimes = [];
     const concentrations = [];
 
+    // set up x values of datetimes
     filteredData.forEach(row => {
         const adjustedDate = adjustTimestampTo2024(new Date(row.timestamp));
         datetimes.push(adjustedDate);
         concentrations.push(parseFloat(row[pollutant]) || 0);
     });
 
-    createPlot(datetimes, concentrations, pollutant);
+    // plot filtered data
+    createPlot(datetimes, concentrations, pollutant, startDate, endDate);
 }
 
-// Create the Chart.js plot
-function createPlot(datetimes, concentrations, pollutant) {
+// Create the plot in the scatterPlot of index.html
+function createPlot(datetimes, concentrations, pollutant, startDate, endDate) {
     const ctx = document.getElementById('scatterPlot').getContext('2d');
 
+    // clear existing plot
     if (chartInstance) {
         chartInstance.destroy();
     }
 
+    // If more than a few days, we probably want to just show daily x ticks
+    let timeUnit = 'day';
+    const timeDifference = endDate - startDate;
+    if (timeDifference < 4 * 24 * 60 * 60 * 1000) { // less than 4 days in milliseconds
+        timeUnit = 'hour';
+    }
+
+    // instantiate and format the chart
     chartInstance = new Chart(ctx, {
         type: 'scatter',
         data: {
             datasets: [{
-                label: `Hourly ${pollutant.toUpperCase()} AQI`,
+                label: `Hourly AQI for ${pollutant.toUpperCase()}`, // match the dropdown format
                 data: datetimes.map((x, i) => ({ x, y: concentrations[i] })),
                 backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1,
-                pointRadius: 3
+                borderColor: 'rgba(75, 192, 192, 1)' // match the website color scheme
             }]
         },
         options: {
@@ -103,7 +120,7 @@ function createPlot(datetimes, concentrations, pollutant) {
                 x: {
                     type: 'time',
                     time: {
-                        unit: 'day',
+                        unit: timeUnit,
                         tooltipFormat: 'yyyy-MM-dd HH:mm',
                         displayFormats: {
                             hour: 'MMM dd, HH:mm',
@@ -127,7 +144,7 @@ function createPlot(datetimes, concentrations, pollutant) {
                 tooltip: {
                     callbacks: {
                         label: function (context) {
-                            return `${context.raw.x}: ${context.raw.y.toFixed(2)}`;
+                            return `${context.raw.x}: ${pollutant.toUpperCase()} AQI ${context.raw.y.toFixed(2)}`; // allow the user to hover over a data point for more information
                         }
                     }
                 }
@@ -136,29 +153,41 @@ function createPlot(datetimes, concentrations, pollutant) {
     });
 }
 
-// Initialize the dropdown with CSV file options and set up event listeners
+// Set up dropdown for selecting a CSV with event listeners
 function initializeDropdown() {
-    const dropdown = document.getElementById('csvDropdown');
+    const dropdown = document.getElementById('csvDropdown'); // link to index.html item
     
     // Clear any existing options to avoid duplicates
     dropdown.innerHTML = '';
 
-    // Generate CSV file names and populate the dropdown
-    const csvFiles = Array.from({ length: 10 }, (_, i) => `aqi_${i}.csv`);
-    csvFiles.forEach(file => {
+    // Fill the dropdown with labels
+    const labels = [
+        "Monitor 1 - Glenlake",
+        "Monitor 2 - Barton Creek",
+        "Monitor 3 - UT Austin",
+        "Monitor 4 - South Congress",
+        "Monitor 5 - Mueller",
+        "Monitor 6 - East Austin",
+        "Monitor 7 - Dogs Head",
+        "Monitor 8 - Riverside",
+        "Monitor 9 - Garden Valley",
+        "Monitor 10 - Montopolis"
+    ];
+    const csvFiles = Array.from({ length: 10 }, (_, i) => `aqi_${i}.csv`); // csv files to pull in
+    
+    csvFiles.forEach((file, i) => {
         const option = document.createElement('option');
         option.value = file;
-        option.textContent = file;
+        option.textContent = labels[i]; // visual name is from labels
         dropdown.appendChild(option);
     });
 
-    // Add an event listener for file selection
+    // Event listener is used to select the file
     dropdown.addEventListener('change', async () => {
         const selectedFile = dropdown.value;
         await loadCSV(selectedFile);
     });
 }
-
 
 // Set up the page on load
 window.onload = function () {

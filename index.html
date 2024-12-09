@@ -36,27 +36,27 @@
 
   <div id="page-container">
     <div id="map-page" class="page active">
-      <h1>Map</h1>
+      <h1>Air Monitor Map</h1>
       <div id="info"></div>
       <div id="map-container"></div>
     </div>
 
     <div id="chart-page" class="page">
-      <h1 class="page-title">Pollution Data Plotter</h1>
+      <h1 class="page-title">2024 Air Quality Index Data Plotter</h1>
 
       <!-- Dropdown to Select CSV File -->
-      <label for="csvDropdown">Select Data File:</label>
+      <label for="csvDropdown">Select Monitor:</label>
       <select id="csvDropdown">
-        <option value="aqi_0.csv">AQI Data 0</option>
-        <option value="aqi_1.csv">AQI Data 1</option>
-        <option value="aqi_2.csv">AQI Data 2</option>
-        <option value="aqi_3.csv">AQI Data 3</option>
-        <option value="aqi_4.csv">AQI Data 4</option>
-        <option value="aqi_5.csv">AQI Data 5</option>
-        <option value="aqi_6.csv">AQI Data 6</option>
-        <option value="aqi_7.csv">AQI Data 7</option>
-        <option value="aqi_8.csv">AQI Data 8</option>
-        <option value="aqi_9.csv">AQI Data 9</option>
+        <option value="aqi_0.csv">Monitor 1 - Glenlake</option>
+        <option value="aqi_1.csv">Monitor 2 - Barton Creek</option>
+        <option value="aqi_2.csv">Monitor 3 - UT Austin</option>
+        <option value="aqi_3.csv">Monitor 4 - South Congress</option>
+        <option value="aqi_4.csv">Monitor 5 - Mueller</option>
+        <option value="aqi_5.csv">Monitor 6 - East Austin</option>
+        <option value="aqi_6.csv">Monitory 7 - Dogs Head</option>
+        <option value="aqi_7.csv">Monitor 8 - Riverside</option>
+        <option value="aqi_8.csv">Monitor 9 - Garden Valley</option>
+        <option value="aqi_9.csv">Monitor 10 - Montopolis</option>
       </select>
 
       <!-- Dropdown to Select Pollutant to Plot -->
@@ -104,7 +104,7 @@
 
   <!-- Scripts -->
   <script src="scripts/main.js"></script>
-  <script type="module" src="scripts/map.js"></script>
+  <script type="module" src="scripts/map.js?nocache=1"></script>
   <script src="scripts/chart.js"></script>
   <script src="scripts/info.js"></script>
 </body>
