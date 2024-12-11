@@ -1,0 +1,42 @@
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th,
+td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+}
+
+.green {
+  background-color: #00e400;
+}
+
+.yellow {
+  background-color: #ffff00;
+}
+
+.orange {
+  background-color: #ff7e00;
+}
+
+.red {
+  background-color: #ff0000;
+}
+
+.purple {
+  background-color: #8f3f97;
+}
+
+.maroon {
+  background-color: #7e0023;
+}
+
+.maroon,
+.purple,
+.red {
+  color: white;
+}

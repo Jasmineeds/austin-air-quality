@@ -14,7 +14,7 @@
   <!-- Stylesheets -->
   <link rel="stylesheet" href="styles/main.css">
   <link rel="stylesheet" href="styles/map.css">
-  <link rel="stylesheet" href="styles/chart.css">
+  <link rel="stylesheet" href="styles/quality-index.css">
   <link rel="stylesheet" href="styles/info.css">
 </head>
 
@@ -29,8 +29,8 @@
     <ul class="nav-menu">
       <li data-page="map">Map</li>
       <li data-page="chart">Data</li>
+      <li data-page="index">Index</li>
       <li data-page="info">Pollutant</li>
-      <li data-page="background">Background</li>
     </ul>
   </div>
 
@@ -82,6 +82,26 @@
       <canvas id="scatterPlot" width="400" height="200"></canvas>
     </div>
 
+    <div id="index-page" class="page">
+      <h1 class="page-title">Air Quality Index</h1>
+      <div class="description">
+        Air quality index is a measure of outdoor air quality. It uses concentrations of the six most common air
+        pollutants in the US, especially Particulate Matter and Ozone, to calculate a value that communicates how good
+        or poor the air quality in a certain area is. The index values are categorized into ranges with increasing
+        levels of concern and
+        color-coded for easy recognition.
+      </div>
+
+      <table id="aqiTable">
+        <tr>
+          <th>Daily AQI Color</th>
+          <th>Levels of Concern</th>
+          <th>Values of Index</th>
+          <th>Description of Air Quality</th>
+        </tr>
+      </table>
+    </div>
+
     <div id="info-page" class="page">
       <h1 class="page-title">Pollutant Information</h1>
       <div class="nav-buttons">
@@ -97,15 +117,13 @@
       <div class="section" id="pm"></div>
     </div>
 
-    <div id="background-page" class="page">
-      <h1 class="page-title">Background</h1>
-    </div>
   </div>
 
   <!-- Scripts -->
   <script src="scripts/main.js"></script>
   <script type="module" src="scripts/map.js?nocache=1"></script>
   <script src="scripts/chart.js"></script>
+  <script src="scripts/quality-index.js"></script>
   <script src="scripts/info.js"></script>
 </body>
 
