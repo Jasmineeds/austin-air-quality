@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8"> <!-- Necessary for tab marker -->
+  <meta charset="UTF-8"> <!-- Necessary as we may use µg -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Austin Air Quality</title>
 
@@ -14,7 +14,7 @@
   <!-- Stylesheets -->
   <link rel="stylesheet" href="styles/main.css">
   <link rel="stylesheet" href="styles/map.css">
-  <link rel="stylesheet" href="styles/chart.css">
+  <link rel="stylesheet" href="styles/quality-index.css">
   <link rel="stylesheet" href="styles/info.css">
 </head>
 
@@ -29,8 +29,8 @@
     <ul class="nav-menu">
       <li data-page="map">Map</li>
       <li data-page="chart">Data</li>
+      <li data-page="index">Index</li>
       <li data-page="info">Pollutant</li>
-      <li data-page="background">Background</li>
     </ul>
   </div>
 
@@ -83,6 +83,25 @@
       <canvas id="scatterPlot" width="400" height="200"></canvas>
     </div>
 
+    <div id="index-page" class="page">
+      <h1 class="page-title">Air Quality Index</h1>
+      <div class="description">
+        Air quality index (AQI) is a measure of outdoor air quality, and a reflection of human health hazards related to air pollution. 
+        It can be calculated for the six criteria pollutants regulated by the US Environmental Protection Agency, but by convention is 
+        reported for Particulate Matter 2.5 or Ozone (whichever yields a greater AQI). AQI values are categorized into ranges with 
+        increasing levels of concern and color codes for easy recognition.
+      </div>
+
+      <table id="aqiTable">
+        <tr>
+          <th>AQI Color</th>
+          <th>Levels of Concern</th>
+          <th>Index Values</th>
+          <th>Description of Air Quality</th>
+        </tr>
+      </table>
+    </div>
+
     <div id="info-page" class="page">
       <h1 class="page-title">Pollutant Information</h1>
       <div class="nav-buttons">
@@ -91,17 +110,20 @@
         <button class="nav-button" data-section="o3">O3</button>
         <button class="nav-button" data-section="pm">PM</button>
       </div>
+      <!-- Content generated from scripts/info.js -->
+      <div class="section" id="co"></div>
+      <div class="section" id="no2"></div>
+      <div class="section" id="o3"></div>
+      <div class="section" id="pm"></div>
     </div>
 
-    <div id="background-page" class="page">
-      <h1 class="page-title">Background</h1>
-    </div>
   </div>
 
   <!-- Scripts -->
   <script src="scripts/main.js"></script>
   <script type="module" src="scripts/map.js?nocache=1"></script>
   <script src="scripts/chart.js"></script>
+  <script src="scripts/quality-index.js"></script>
   <script src="scripts/info.js"></script>
 </body>
 
