@@ -1,7 +1,6 @@
-// JavaScript for dynamically selecting and plotting AQI data from CSV files in server
-
+// This script plots AQI values from a selected monitor site, over selected dates in 2024
 let airData = [];
-let chartInstance = null;
+let airChart = null;
 
 // Load CSV data based on the selected file from the dropdown
 async function loadCSV(selectedFile) {
@@ -10,21 +9,23 @@ async function loadCSV(selectedFile) {
 }
 
 // Check if a date is within the valid range (2024 up to the present date)
-function isValidDateRange(startDate, endDate) {
+function areDatesValid(startDate, endDate) {
     const today = new Date();
     today.setHours(23, 59, 59, 999); // Set to end of the day
 
     const start = new Date(startDate);
     const end = new Date(endDate);
 
+    // is date within 2024
     if (start < new Date('2024-01-01') || end < new Date('2024-01-01')) {
         return false;
     }
 
+    // is date prior to today
     return start <= today && end <= today && start <= end;
 }
 
-// Needed for later - to set CSV dates to 2024
+// Needed for later - to set CSV dates to 2024 (inverse of how map worked)
 function adjustTimestampTo2024(timestamp) {
     const date = new Date(timestamp);
     date.setFullYear(2024);
@@ -38,7 +39,7 @@ function processData() {
     const endDateInput = document.getElementById('endDate').value; // get enddate from dropdown
 
     // make sure data is in appropriate range, i.e. 2024
-    if (!isValidDateRange(startDateInput, endDateInput)) {
+    if (!areDatesValid(startDateInput, endDateInput)) {
         alert("Select a site and an appropriate date range.");
         return;
     }
@@ -77,7 +78,7 @@ function processData() {
     const datetimes = [];
     const concentrations = [];
 
-    // set up x values of datetimes
+    // set up x values of datetimes and y values of pollutants by pushing each
     filteredData.forEach(row => {
         const adjustedDate = adjustTimestampTo2024(new Date(row.timestamp));
         datetimes.push(adjustedDate);
@@ -90,12 +91,10 @@ function processData() {
 
 // Create the plot in the scatterPlot of index.html
 function createPlot(datetimes, concentrations, pollutant, startDate, endDate) {
-    const ctx = document.getElementById('scatterPlot').getContext('2d');
+    const chartSpace = document.getElementById('scatterPlot').getContext('2d');
 
     // clear existing plot
-    if (chartInstance) {
-        chartInstance.destroy();
-    }
+    if (airChart) {airChart.destroy()};
 
     // If more than a few days, we probably want to just show daily x ticks
     let timeUnit = 'day';
@@ -105,18 +104,24 @@ function createPlot(datetimes, concentrations, pollutant, startDate, endDate) {
     }
 
     // instantiate and format the chart
-    chartInstance = new Chart(ctx, {
+    airChart = new Chart(chartSpace, {
+
         type: 'scatter',
+
+        // set chart data
         data: {
             datasets: [{
                 label: `Hourly AQI for ${pollutant.toUpperCase()}`, // match the dropdown format
-                data: datetimes.map((x, i) => ({ x, y: concentrations[i] })),
-                backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                borderColor: 'rgba(75, 192, 192, 1)' // match the website color scheme
+                data: datetimes.map((x, c) => ({ x, y: concentrations[c] })),
+                backgroundColor: 'rgba(75, 190, 190, 0.4)', // match the website color scheme
+                borderColor: 'rgba(75, 190, 190, 1)'
             }]
         },
-        options: {
+
+        // label axes and set ymin as 0
+        options: { 
             scales: {
+
                 x: {
                     type: 'time',
                     time: {
@@ -127,27 +132,14 @@ function createPlot(datetimes, concentrations, pollutant, startDate, endDate) {
                             day: 'MMM dd',
                         }
                     },
-                    title: {
-                        display: true,
-                        text: 'Timestamp'
-                    }
+                    title: {display: true, text: 'Timestamp'}
                 },
+
                 y: {
                     beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Air Quality Index'
-                    }
+                    title: {display: true, text: 'Air Quality Index'}
                 }
-            },
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: function (context) {
-                            return `${context.raw.x}: ${pollutant.toUpperCase()} AQI ${context.raw.y.toFixed(2)}`; // allow the user to hover over a data point for more information
-                        }
-                    }
-                }
+
             }
         }
     });
@@ -155,32 +147,9 @@ function createPlot(datetimes, concentrations, pollutant, startDate, endDate) {
 
 // Set up dropdown for selecting a CSV with event listeners
 function initializeDropdown() {
-    const dropdown = document.getElementById('csvDropdown'); // link to index.html item
-    
-    // Clear any existing options to avoid duplicates
-    dropdown.innerHTML = '';
 
-    // Fill the dropdown with labels
-    const labels = [
-        "Monitor 1 - Glenlake",
-        "Monitor 2 - Barton Creek",
-        "Monitor 3 - UT Austin",
-        "Monitor 4 - South Congress",
-        "Monitor 5 - Mueller",
-        "Monitor 6 - East Austin",
-        "Monitor 7 - Dogs Head",
-        "Monitor 8 - Riverside",
-        "Monitor 9 - Garden Valley",
-        "Monitor 10 - Montopolis"
-    ];
-    const csvFiles = Array.from({ length: 10 }, (_, i) => `aqi_${i}.csv`); // csv files to pull in
-    
-    csvFiles.forEach((file, i) => {
-        const option = document.createElement('option');
-        option.value = file;
-        option.textContent = labels[i]; // visual name is from labels
-        dropdown.appendChild(option);
-    });
+    // link to index.html item
+    const dropdown = document.getElementById('csvDropdown'); 
 
     // Event listener is used to select the file
     dropdown.addEventListener('change', async () => {
